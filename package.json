@@ -1,0 +1,11 @@
+{
+    "name": "rezzer-ai",
+    "version": "1.0.0",
+    "workspaces": [
+        "client",
+        "server"
+    ],
+    "scripts": {
+        "test-gemini": "npm run test-gemini -w server"
+    }
+}
