@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://rezzer-ai.onrender.comapi/:path*"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }

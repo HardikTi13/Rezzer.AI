@@ -12,7 +12,8 @@ const MealHistory = () => {
 
     const fetchMeals = async () => {
         try {
-            const res = await axios.get('/api/meals');
+            const API_URL = import.meta.env.VITE_API_URL || '';
+            const res = await axios.get(`${API_URL}/api/meals`);
             setMeals(res.data);
         } catch (error) {
             console.error(error);

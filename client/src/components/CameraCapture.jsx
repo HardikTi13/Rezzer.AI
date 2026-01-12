@@ -22,8 +22,8 @@ const CameraCapture = ({ onCapture }) => {
     formData.append('image', file);
 
     try {
-      // In Vite, /api proxies to localhost:5000
-      const response = await axios.post('/api/analyze', formData, {
+      const API_URL = import.meta.env.VITE_API_URL || '';
+      const response = await axios.post(`${API_URL}/api/analyze`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
