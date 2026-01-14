@@ -5,7 +5,7 @@ dotenv.config();
 
 // Initialize with new SDK syntax
 const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const MODEL_NAME = "gemini-2.0-flash";
+const MODEL_NAME = "gemini-1.5-flash";
 
 exports.analyzeFood = async (imageBuffer, mimeType) => {
     try {
