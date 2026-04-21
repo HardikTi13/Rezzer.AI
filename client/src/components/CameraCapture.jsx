@@ -31,7 +31,8 @@ const CameraCapture = ({ onCapture }) => {
       onCapture(response.data);
     } catch (err) {
       console.error(err);
-      setError('Failed to analyze image. Please try again.');
+      const errorMessage = err.response?.data?.details || err.response?.data?.error || 'Failed to analyze image. Please try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

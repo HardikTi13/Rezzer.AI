@@ -5,7 +5,7 @@ dotenv.config();
 
 // Initialize with new SDK syntax
 const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const MODEL_NAME = "gemini-1.5-flash";
+const MODEL_NAME = "gemini-2.5-flash"; // User requested model
 
 exports.analyzeFood = async (imageBuffer, mimeType) => {
     try {
@@ -29,20 +29,31 @@ exports.analyzeFood = async (imageBuffer, mimeType) => {
         const response = await genAI.models.generateContent({
             model: MODEL_NAME,
             contents: [
-                { text: prompt },
                 {
-                    inlineData: {
-                        data: imageBuffer.toString("base64"),
-                        mimeType: mimeType,
-                    },
+                    role: 'user',
+                    parts: [
+                        { text: prompt },
+                        {
+                            inlineData: {
+                                data: imageBuffer.toString("base64"),
+                                mimeType: mimeType,
+                            },
+                        }
+                    ]
                 }
             ]
         });
 
         // Handle response safely
-        const text = typeof response.text === 'function' ? response.text() : response.text;
-        const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        return JSON.parse(jsonStr);
+        const responseText = response.text || '';
+        
+        // Robust JSON extraction
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error("AI response did not contain valid JSON: " + responseText);
+        }
+        
+        return JSON.parse(jsonMatch[0]);
     } catch (error) {
         console.error("Gemini Analysis Error:", error);
         throw new Error("Failed to analyze image with Gemini: " + error.message);

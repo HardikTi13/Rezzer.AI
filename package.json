@@ -6,6 +6,11 @@
         "server"
     ],
     "scripts": {
+        "dev": "concurrently \"npm run dev -w client\" \"npm run start -w server\"",
+        "install-all": "npm install && npm install -w client && npm install -w server",
         "test-gemini": "npm run test-gemini -w server"
+    },
+    "devDependencies": {
+        "concurrently": "^9.2.1"
     }
 }

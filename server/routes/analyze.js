@@ -18,36 +18,41 @@ router.post('/', upload.single('image'), async (req, res) => {
         console.log('📸 Image received:', req.file.originalname);
 
         // 1. Upload to Cloudinary
+        console.log('☁️ Uploading to Cloudinary...');
         const uploadStream = cloudinary.uploader.upload_stream(
             { folder: 'ai-nutritionist' },
             async (error, result) => {
                 if (error) {
-                    console.error('Cloudinary Upload Error:', error);
-                    return res.status(500).json({ error: 'Image upload failed' });
+                    console.error('❌ Cloudinary Upload Error:', error);
+                    return res.status(500).json({ error: 'Image upload to Cloudinary failed: ' + error.message });
                 }
 
-                console.log('✅ Image uploaded to Cloudinary');
+                console.log('✅ Image uploaded to Cloudinary:', result.secure_url);
 
                 try {
                     // 2. Analyze with Gemini
                     console.log('🤖 Analyzing with Gemini...');
                     const analysisResult = await analyzeFood(req.file.buffer, req.file.mimetype);
-                    console.log('✅ Analysis complete');
+                    console.log('✅ AI Analysis complete');
 
                     // 3. Save to Database
+                    console.log('💾 Saving to Database...');
                     const newMeal = new Meal({
                         ...analysisResult,
                         imageUrl: result.secure_url
                     });
 
                     await newMeal.save();
-                    console.log('💾 Meal saved to DB');
+                    console.log('✅ Meal saved to DB');
 
                     res.json(newMeal);
 
                 } catch (aiError) {
-                    console.error('AI Analysis Error:', aiError);
-                    res.status(500).json({ error: 'AI Analysis failed' });
+                    console.error('❌ AI Analysis or DB Error:', aiError.message);
+                    res.status(500).json({ 
+                        error: 'Failed to analyze or save meal', 
+                        details: aiError.message 
+                    });
                 }
             }
         );
@@ -55,8 +60,8 @@ router.post('/', upload.single('image'), async (req, res) => {
         stream.Readable.from(req.file.buffer).pipe(uploadStream);
 
     } catch (err) {
-        console.error('Server Error:', err);
-        res.status(500).json({ error: 'Server error' });
+        console.error('❌ Unexpected Server Error:', err);
+        res.status(500).json({ error: 'Internal server error', details: err.message });
     }
 });
 

@@ -6,7 +6,7 @@ const analyzeRoutes = require('./routes/analyze');
 const mealRoutes = require('./routes/meals');
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ override: true });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -16,9 +16,12 @@ app.use(cors());
 app.use(express.json());
 
 // Database Connection
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('✅ MongoDB connected'))
-    .catch(err => console.error('❌ MongoDB connection error:', err));
+const mongodb_uri = process.env.MONGODB_URI;
+const masked_uri = mongodb_uri ? mongodb_uri.replace(/:([^@]+)@/, ':****@') : 'undefined';
+
+mongoose.connect(mongodb_uri)
+    .then(() => console.log(`✅ MongoDB connected: ${masked_uri}`))
+    .catch(err => console.error(`❌ MongoDB connection error [${masked_uri}]:`, err));
 
 // Routes
 app.get('/', (req, res) => {
